@@ -320,6 +320,7 @@ li .content-box{
 	cursor:pointer;
 	padding-right:10px;
 	text-indent:0;
+	position:relative;
 }
 .popup-backdrop{
 	display:none;
@@ -381,6 +382,26 @@ li .content-box{
 	margin-left:-20px;
 	margin-top:7px;
 	cursor:pointer;
+}
+.toolbar-icon.has-badge:after{
+	content:attr(badge-value);
+	position:absolute;
+	background-color:#e3094c;
+	font-family:sans-serif;
+	color:#FFF;
+	border-radius: 10px;
+    height: 15px;
+    line-height: 16px;
+    font-size: 12px;
+    text-align: center;
+	padding: 0 3px 0 3px;
+    text-indent: 0;
+    margin-top: 2px;
+	right: 2px;
+	font-weight: initial;
+	pointer-events:none;
+	-moz-pointer-events:none;
+	-ms-pointer-events:none;
 }
 </style>
 </head>
@@ -786,7 +807,7 @@ li .content-box{
 				<a onclick="alert(\'This shows a popup listing all users in this level, including users in selected groups/departments. Not working in mockup.\')" class="header-badge"></a>\
 				<a class="fa fa-trash-alt toolbar-icon" title="Delete Selected" onclick="deleteSelected()"></a>\
 				<a onclick="$(\'#date-popup\').show();" class="fa fa-calendar-alt toolbar-icon" title="Set Due Date"></a>\
-				<a class="fa fa-users toolbar-icon" style="position:relative;" title="Set Number of Required users"><select onchange="alert(\'This feature is not working in this mockup.\')"><option>All</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option></select></a>\
+				<a class="fa fa-users toolbar-icon" style="position:relative;" title="Set Number of Required users"><select onchange="setRequiredUsers(this)"><option>All</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option></select></a>\
 			</div>\
 			<div class="content-box drop-container"></div>';
 		var levelCount = levelList.getElementsByTagName('li').length;
@@ -844,8 +865,17 @@ li .content-box{
 			}
 		});
 		sortItems();
-		selectedItem = item;
+		selectedItem = null;
 		item.focus();
+	}
+	
+	function setRequiredUsers(t){
+		if(parseInt(t.value)){
+			t.parentElement.setAttribute('badge-value', t.value);
+			t.parentElement.classList.add('has-badge');
+		} else {
+			t.parentElement.classList.remove('has-badge');
+		}
 	}
 </script>
 
