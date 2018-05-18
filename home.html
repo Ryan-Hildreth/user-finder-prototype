@@ -784,12 +784,12 @@ li .content-box{
 		for (var i = 0; i < labels.length; i++){
 			if (labels[i].innerText == el.innerText){
 				checkboxes[i].checked = false;
-				el.parentElement.removeChild(el);
-				sortItems();
-				selectedItem = null;
-				return;
+				break;
 			}
 		}
+		el.parentElement.removeChild(el);
+		selectedItem = null;
+		sortItems();
 	}
 	
 	var selectedLevel = 0;
