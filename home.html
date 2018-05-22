@@ -61,7 +61,7 @@ html,body{
 	overflow:auto;
 	height:100%;
 	position: relative;
-	max-height:314px;
+	max-height:324px;
 }
 .header-text{
 	font-weight:700;
@@ -76,16 +76,15 @@ html,body{
 	border-radius:10px;
 	height:15px;
 	line-height:16px;
-	font-size:12px;
+	font-size:10px;
 	min-width:15px;
-	background-color:#3265d7;
-	color:#FFF;
+	background-color:#333;
+	font-weight:700;
+	color:#edecec;
 	text-align:center;
 	display:inline-block;
 	padding:0 3px 0 3px;
 	text-indent:0;
-	position:absolute;
-	margin-top:2px;
 	cursor:pointer;
 }
 .header-bar>td,
@@ -135,7 +134,6 @@ div.header-bar{
 	cursor:pointer;
 }
 .search-box {
-	margin-bottom:5px;
 	display:inline-block;
 	width:100%;
 }
@@ -258,8 +256,12 @@ a{
 	padding-top:0;
 	border-top:0;
 }
+.content-box li.selected .content-box{
+	border-color:#333;
+}
 .content-box li.selected .header-bar{
 	background-color:#d9ece5;
+	border-color:#333;
 }
 .dragging .drop-container .content-item{
 	opacity:0.3;
@@ -406,8 +408,10 @@ li .content-box{
 </style>
 </head>
 <body>
+<div><img src="background.png"></img></div>
+<div style="position:absolute;top:0;width:1024px;height:634px;cursor:not-allowed;padding:70px 0 0 160px;">
 <div class="header-text" style="margin-left:15px;">Available Users</div>
-<div style="height:450px;max-width:900px;">
+<div style="height:450px;max-width:900px;cursor:default;">
 <div class="panel-50p" style="padding:0 15px 15px 15px;height:100%;">
 	<table class="user-select-content-area bordered">
 		<tr class="header-bar">
@@ -461,7 +465,7 @@ li .content-box{
 	<a onclick="addLevel();updateLevelLabels();sortItems();" style="position:absolute;bottom:15px;"><i class="fa fa-plus"></i>&nbsp;Add Level</a>
 </div>
 </div>
-<div class="popup-backdrop" id="date-popup"><div class="popup">
+<div style="cursor:default;" class="popup-backdrop" id="date-popup"><div class="popup">
 	<div class="header-bar">
 		<span style="margin-top: 2px;display: inline-block;">Due Date</span>
 		<a onclick="$('#date-popup').hide();" class="fa fa-times toolbar-icon" style="color:#333;" title="Close"></a>
@@ -557,7 +561,7 @@ li .content-box{
 	</div>
 	</div>
 	</div>
-</div></div>
+</div></div></div>
 <script>
 	var site = 'Main Office';
 	function setSiteLabel(event){
@@ -807,9 +811,9 @@ li .content-box{
 		var li = document.createElement('li');
 		li.innerHTML = '\
 			<div class="header-bar">\
-				<span class="header-text"></span>\
-				<a onclick="removeLevel(this.parentElement.parentElement, event)" class="fa fa-times toolbar-icon close-btn" style="color:#D00;" title="Close"></a>\
 				<a onclick="alert(\'This shows a popup listing all users in this level, including users in selected groups/departments. Not working in mockup.\')" class="header-badge"></a>\
+				<span class="header-text"></span>\
+				<a onclick="removeLevel(this.parentElement.parentElement, event)" class="fa fa-times toolbar-icon close-btn" style="color:#D00;" title="Remove Level"></a>\
 				<a class="fa fa-trash-alt toolbar-icon" title="Remove Selected" onclick="deleteSelected()"></a>\
 				<a onclick="$(\'#date-popup\').show();" class="fa fa-calendar-alt toolbar-icon" title="Set Due Date"></a>\
 				<a class="fa fa-users toolbar-icon" style="position:relative;" title="Set Number of Required Users"><select onchange="setRequiredUsers(this)"><option>All</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option></select></a>\
