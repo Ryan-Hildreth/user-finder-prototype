@@ -71,7 +71,6 @@ html,body{
     text-indent:2px;
     font-size: 14px;
 	margin-top:15px;
-	margin-left:15px;
 }
 .header-badge{
 	border-radius:10px;
@@ -83,7 +82,7 @@ html,body{
 	color:#FFF;
 	text-align:center;
 	display:inline-block;
-	padding:0 5px 0 3px;
+	padding:0 3px 0 3px;
 	text-indent:0;
 	position:absolute;
 	margin-top:2px;
@@ -109,7 +108,7 @@ div.header-bar{
 	width:100%;
 }
 .site-selector .select-box {
-	display:block!important;
+	display:inline-block!important;
 }
 .select-box {
 	display:inline-block;
@@ -129,9 +128,10 @@ div.header-bar{
 	position:absolute;
 	display:block;
 	width:100%;
+	height:100%;
 	opacity:0;
-	top:0;bottom:0;
-	height:26px;
+	top:0;
+	left:0;
 	cursor:pointer;
 }
 .search-box {
@@ -289,7 +289,7 @@ li .content-box{
 	border-top-right-radius:6px;
 	border-top-left-radius:6px;
 	line-height:30px;
-	text-indent:8px;
+	padding:0 8px;
 }
 .drag-container{
 	transform:translateX(50%) translateY(50%);
@@ -318,7 +318,7 @@ li .content-box{
 	line-height:34px;
 	float:right;
 	cursor:pointer;
-	padding-right:16px;
+	padding:0 8px 0 8px;
 	text-indent:0;
 	position:relative;
 }
@@ -397,8 +397,8 @@ li .content-box{
 	padding: 0 3px 0 3px;
     text-indent: 0;
     margin-top: 2px;
-	right: 8px;
-	font-weight: initial;
+	right: 0px;
+	font-weight: normal;
 	pointer-events:none;
 	-moz-pointer-events:none;
 	-ms-pointer-events:none;
@@ -406,7 +406,7 @@ li .content-box{
 </style>
 </head>
 <body>
-<div class="header-text">Available Users</div>
+<div class="header-text" style="margin-left:15px;">Available Users</div>
 <div style="height:450px;max-width:900px;">
 <div class="panel-50p" style="padding:0 15px 15px 15px;height:100%;">
 	<table class="user-select-content-area bordered">
@@ -425,7 +425,8 @@ li .content-box{
 			<td>
 				<div style="padding:5px;">
 					<div class="site-selector">
-						<div class="select-box">
+						<span style="margin-top:6px;display:inline-block;">Site:</span>
+						<div class="select-box" style="float:right;width:calc(100% - 40px);">
 							<select onchange="setSiteLabel(event)">
 								<option>Main Office</option>
 								<option>Remote Office</option>
@@ -723,8 +724,9 @@ li .content-box{
 		let list = levelList.getElementsByTagName('li');
 		for (var i = 0; i < list.length; i++){
 			let header = list[i].getElementsByClassName('header-text')[0];
-			if (header)
-				header.innerText = 'Level ' + (i + 1);
+			if (header){
+				header.innerText = 'Reviewers (Level ' + (i + 1) + ')';
+			}
 		}
 	}
 	window.addEventListener('load', function(){
@@ -794,7 +796,9 @@ li .content-box{
 	
 	var selectedLevel = 0;
 	function setSelectedLevel(lvl){
-		levelList.getElementsByTagName('li')[selectedLevel].classList.remove('selected');
+		if (levelList.getElementsByTagName('li')[selectedLevel]){
+			levelList.getElementsByTagName('li')[selectedLevel].classList.remove('selected');
+		}
 		selectedLevel = lvl;
 		levelList.getElementsByTagName('li')[selectedLevel].classList.add('selected');
 	}
@@ -804,28 +808,40 @@ li .content-box{
 		li.innerHTML = '\
 			<div class="header-bar">\
 				<span class="header-text"></span>\
+				<a onclick="removeLevel(this.parentElement.parentElement, event)" class="fa fa-times toolbar-icon close-btn" style="color:#D00;" title="Close"></a>\
 				<a onclick="alert(\'This shows a popup listing all users in this level, including users in selected groups/departments. Not working in mockup.\')" class="header-badge"></a>\
-				<a class="fa fa-trash-alt toolbar-icon" title="Delete Selected" onclick="deleteSelected()"></a>\
+				<a class="fa fa-trash-alt toolbar-icon" title="Remove Selected" onclick="deleteSelected()"></a>\
 				<a onclick="$(\'#date-popup\').show();" class="fa fa-calendar-alt toolbar-icon" title="Set Due Date"></a>\
-				<a class="fa fa-users toolbar-icon" style="position:relative;" title="Set Number of Required users"><select onchange="setRequiredUsers(this)"><option>All</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option></select></a>\
+				<a class="fa fa-users toolbar-icon" style="position:relative;" title="Set Number of Required Users"><select onchange="setRequiredUsers(this)"><option>All</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option></select></a>\
 			</div>\
 			<div class="content-box drop-container"></div>';
-		var levelCount = levelList.getElementsByTagName('li').length;
 		li.addEventListener('mousedown', function(){
-			setSelectedLevel(levelCount);
+			let levels = levelList.getElementsByTagName('li');
+			for (var i = 0; i < levels.length; i++){
+				if (levels[i] == li){
+					setSelectedLevel(i);
+					break;
+				}
+			}
 		});
 		$(li).droppable({
 			drop: function( event, ui ) {
 				if (ui.draggable.hasClass('content-item')){
 					ui.draggable.appendTo(event.target.getElementsByClassName('content-box')[0]);
 					sortItems();
-					setSelectedLevel(levelCount);
+					let levels = levelList.getElementsByTagName('li');
+					for (var i = 0; i < levels.length; i++){
+						if (levels[i] == li){
+							setSelectedLevel(i);
+							break;
+						}
+					}
 				}
 			}
 		});
 		levelList.appendChild(li);
 		li.scrollIntoView(false);
-		setSelectedLevel(levelCount);
+		setSelectedLevel(levelList.getElementsByTagName('li').length - 1);
 		return levelList.getElementsByTagName('li');
 	}
 	
@@ -867,6 +883,20 @@ li .content-box{
 		sortItems();
 		selectedItem = null;
 		item.focus();
+	}
+	
+	function removeLevel(el, event){
+		event.stopPropagation();
+		event.preventDefault();
+		if (el.getElementsByClassName('content-item').length > 0){
+			alert('You must first remove all users from this level before it can be removed.');
+		} else if (el.parentElement.getElementsByTagName('li').length <= 1) {
+			alert('There must be at least one level.');
+		} else {
+			el.parentElement.removeChild(el);
+			updateLevelLabels();
+			setSelectedLevel(0);
+		}
 	}
 	
 	function setRequiredUsers(t){
