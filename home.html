@@ -65,7 +65,6 @@ html,body{
 }
 .header-text{
 	font-weight:700;
-	font-size:12px;
 	margin-bottom:5px;
 	height:18px;
     text-indent:2px;
@@ -199,14 +198,23 @@ input:focus, button:focus, select:focus{
 	outline:1px dotted #FFF;
 	outline-offset:-3px;
 }
-input[type=checkbox]{
+.checkbox-tree input[type=checkbox]{
 	margin-left:20px;
+}
+input[type=checkbox]:disabled,
+input[type=radio]:disabled{
+	cursor:not-allowed;
 }
 input[type=checkbox]+label,
 input[type=radio]+label{
 	font-size: 14px;
     color: #333;
 	cursor:pointer;
+}
+input[type=checkbox]:disabled+label,
+input[type=radio]:disabled+label{
+    color: #777;
+	cursor:not-allowed;
 }
 #checkbox-area input[type=checkbox]+label:before{
 	content:"";
@@ -248,13 +256,15 @@ a{
 	padding:15px;
 	font-family:sans-serif;
 	margin-top: 0;
-	margin-bottom:15px;
 	list-style:none;
 	min-height:50px;
 	position:relative;
 	max-height:100%;
 	padding-top:0;
 	border-top:0;
+}
+ul>li:not(:last-of-type){
+	margin-bottom:15px;
 }
 .content-box li.selected .content-box{
 	border-color:#333;
@@ -294,7 +304,7 @@ li .content-box{
 	padding:0 8px;
 }
 .drag-container{
-	transform:translateX(50%) translateY(50%);
+	white-space:nowrap;
 	background-color:#EEE;
 	border:1px solid #DDD;
 	padding:3px;
@@ -460,9 +470,14 @@ li .content-box{
 	</a>
 </div>
 </div>
-<div class="panel-50p" id="content-main" style="position:relative;overflow:hidden;height:100%;">
-	<ul class="content-box" id="level-list" style="border:0;margin-bottom:0;padding-left:0;height:calc(100% - 40px);"></ul>
-	<a onclick="addLevel();updateLevelLabels();sortItems();" style="position:absolute;bottom:15px;"><i class="fa fa-plus"></i>&nbsp;Add Level</a>
+<div class="panel-50p" id="content-main" style="position:relative;overflow:visible;height:100%;">
+	<ul class="content-box" id="level-list" style="border:0;margin-bottom:0;padding-left:0;padding-bottom:0;max-height:calc(100% - 15px);"></ul>
+	<table width="100%" style="margin-top:8px;white-space:nowrap;"><tr>
+		<td><a onclick="addLevel();updateLevelLabels();sortItems();"><i class="fa fa-plus"></i>&nbsp;Add Level</a></td>
+		<td><input disabled="" id="make-required-cb" type="checkbox"/><label for="make-required-cb" >Make Required</label></td>
+		<td><input disabled="" id="compliance-approver-cb" type="checkbox"/><label for="compliance-approver-cb">Compliance Approver</label></td>
+	</tr></table>
+	
 </div>
 </div>
 <div style="cursor:default;" class="popup-backdrop" id="date-popup"><div class="popup">
@@ -573,12 +588,11 @@ li .content-box{
 	function setSelectByLabel(event){
 		document.getElementById('select-by-label').innerText = event.target.value;
 		selection = event.target.value.replace(/\s/g, '_');
+		clearSearch();
 		setupCheckboxes();
 	}
 	
-	var search = '';
 	function setSearch(event){
-		search = document.getElementById('search-input').value;
 		setupCheckboxes();
 	}
 	function inputSetSearch(event){
@@ -628,12 +642,12 @@ li .content-box{
 	var data = {
 		Users:[
 			'Breen, Darren (Personnel Manager)',
-			'John, Farnsworth (Information Systems Manager)',
 			'Gleeson, Edward (Mechanical Engineer)',
 			'Grant, Jonathon (Mail Clerk)',
 			'Hansen, Tom (Accounting Manager)',
 			'Howard, Gary (Mechanical Engineer)',
 			'Howard, Susan (Information Systems Manager)',
+			'John, Farnsworth (Information Systems Manager)',
 			'Jensen, Linda (Accountant)',
 			'Johnson, Douglas (Accountant)',
 			'Keller, Anthony (Manufacturing Manager)',
@@ -646,11 +660,11 @@ li .content-box{
 			'Wright, Fred (Software Development Manager)'
 		],
 		User_Groups:[
-			'Managers',
-			'Policy Committee',
 			'Administrators',
+			'All Readers - Main Office',
 			'Finance',
-			'All Readers - Main Office'
+			'Managers',
+			'Policy Committee'
 		],
 		Departments:[
 			'Accounting',
@@ -697,14 +711,14 @@ li .content-box{
 	
 	function setupCheckboxes(){
 		selectBox.innerHTML = '';
-		var searchTerms = search.split(' ');
+		var searchTerms = document.getElementById('search-input').value.split(' ');
 		
 		var keys = Object.keys(data);
 		for (var i = 0; i < keys.length; i++){
 			if (keys[i] == selection){
 				var items = data[keys[i]];
 				for (var j = 0; j < items.length; j++){
-					if (search){
+					if (document.getElementById('search-input').value){
 						for (var k = 0; k < searchTerms.length; k++){
 							if (items[j].toLowerCase().indexOf(searchTerms[k]) >= 0){
 								addCheckbox(keys[i], items[j], items[j]);
@@ -728,7 +742,11 @@ li .content-box{
 		let list = levelList.getElementsByTagName('li');
 		for (var i = 0; i < list.length; i++){
 			let header = list[i].getElementsByClassName('header-text')[0];
-			if (header){
+			if (list.length == 1){
+				list[i].getElementsByClassName('close-btn')[0].style.display = 'none'
+				header.innerText = 'Reviewers';
+			} else {
+				list[i].getElementsByClassName('close-btn')[0].style.display = null;
 				header.innerText = 'Reviewers (Level ' + (i + 1) + ')';
 			}
 		}
@@ -798,13 +816,16 @@ li .content-box{
 		sortItems();
 	}
 	
-	var selectedLevel = 0;
+	var selectedLevel = -1;
 	function setSelectedLevel(lvl){
-		if (levelList.getElementsByTagName('li')[selectedLevel]){
-			levelList.getElementsByTagName('li')[selectedLevel].classList.remove('selected');
+		$('#level-list li').removeClass('selected');
+		if (selectedLevel != lvl){
+			selectedItem = null;
 		}
 		selectedLevel = lvl;
-		levelList.getElementsByTagName('li')[selectedLevel].classList.add('selected');
+		if (levelList.getElementsByTagName('li').length > 1){
+			levelList.getElementsByTagName('li')[selectedLevel].classList.add('selected');
+		}
 	}
 	
 	function addLevel(){
@@ -813,7 +834,7 @@ li .content-box{
 			<div class="header-bar">\
 				<a onclick="alert(\'This shows a popup listing all users in this level, including users in selected groups/departments. Not working in mockup.\')" class="header-badge"></a>\
 				<span class="header-text"></span>\
-				<a onclick="removeLevel(this.parentElement.parentElement, event)" class="fa fa-times toolbar-icon close-btn" style="color:#D00;" title="Remove Level"></a>\
+				<a onmousedown="event.stopPropagation();" onclick="removeLevel(this.parentElement.parentElement, event)" class="fa fa-times toolbar-icon close-btn" style="color:#D00;" title="Remove Level"></a>\
 				<a class="fa fa-trash-alt toolbar-icon" title="Remove Selected" onclick="deleteSelected()"></a>\
 				<a onclick="$(\'#date-popup\').show();" class="fa fa-calendar-alt toolbar-icon" title="Set Due Date"></a>\
 				<a class="fa fa-users toolbar-icon" style="position:relative;" title="Set Number of Required Users"><select onchange="setRequiredUsers(this)"><option>All</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option></select></a>\
@@ -854,7 +875,6 @@ li .content-box{
 		item.innerText = name;
 		item.className = 'content-item';
 		item.tabIndex = -1;
-		item.addEventListener('mousedown', function(event){ event.preventDefault(); event.stopPropagation();});
 		
 		let list = levelList.getElementsByTagName('li');
 		while(!list[level]){
@@ -872,7 +892,7 @@ li .content-box{
 			revert:true,
 			revertDuration:0,
 			distance:20,
-			cursorAt: { right:0, bottom:0 },
+			containment: levelList,
 			appendTo: levelList,
 			start: function(){
 				document.getElementById('content-main').classList.add('dragging');
