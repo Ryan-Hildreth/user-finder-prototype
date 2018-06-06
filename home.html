@@ -486,8 +486,8 @@ li .content-box{
 		<a id="site-label">Main Office</a><i class="btn-dropdown-icon fa fa-caret-down pull-right"></i>
 	</span>
 </div>
-<div style="height:430px;max-width:900px;cursor:default;">
-<div class="panel-50p" style="padding:0 15px 15px 15px;height:calc(100% + 30px);overflow-y:hidden;max-height:unset;">
+<div style="height:415px;max-width:900px;cursor:default;">
+<div class="panel-50p" style="padding:0 15px 15px 15px;height:calc(100% + 45px);overflow-y:hidden;max-height:none;">
 	<div class="user-select-content-area bordered">
 		<div class="search-box">
 			<input id="search-input" type="text" placeholder="Search" onkeypress="inputSetSearch(event)"><button type="button" onclick="setSearch()"><i class="fa fa-search"></i></button>
@@ -498,7 +498,7 @@ li .content-box{
 	</div>
 </div>
 <div class="panel-50p" id="content-main" style="position:relative;overflow:visible;height:100%;">
-	<ul class="content-box" id="level-list" style="border:0;margin-bottom:0;padding-left:0;padding-bottom:0;max-height:calc(100% - 15px);"></ul>
+	<ul class="content-box" id="level-list" style="border:0;margin-bottom:0;padding-left:0;padding-bottom:0;max-height:100%;"></ul>
 	<table width="100%" style="margin-top:8px;white-space:nowrap;"><tr>
 		<td><a onclick="addLevel();updateLevelLabels();sortItems();"><i class="fa fa-plus"></i>&nbsp;Add Level</a></td>
 		<td><input disabled="" id="make-required-cb" type="checkbox"/><label for="make-required-cb" >Make Required</label></td>
@@ -824,8 +824,8 @@ li .content-box{
 				list[i].getElementsByClassName('toolbar-icon-separator')[0].style.display = 'none'
 				header.innerText = 'Reviewers';
 			} else {
-				list[i].getElementsByClassName('close-btn')[0].style.display = null;
-				list[i].getElementsByClassName('toolbar-icon-separator')[0].style.display = null;
+				list[i].getElementsByClassName('close-btn')[0].style.display = 'inline-block';
+				list[i].getElementsByClassName('toolbar-icon-separator')[0].style.display = 'inline-block';
 				header.innerText = 'Reviewers (Level ' + (i + 1) + ')';
 			}
 		}
