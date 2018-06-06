@@ -427,19 +427,18 @@ li .content-box{
 	-ms-pointer-events:none;
 }
 .search-filter {
-	padding:20px 15px 10px 15px;
+	padding:15px 15px 10px 19px;
 	white-space:nowrap;
 	position:relative;
 	cursor:pointer;
 	display:inline-block;
 }
 .search-filter label {
-	position: absolute;
+	display: block;
     font-size: 12px;
     color: #777;
     width: auto;
-    font-weight: normal;
-	margin-top:-14px;
+    font-weight: 700;
 }
 .search-filter a {
 	background-color:transparent;
@@ -487,8 +486,8 @@ li .content-box{
 		<a id="site-label">Main Office</a><i class="btn-dropdown-icon fa fa-caret-down pull-right"></i>
 	</span>
 </div>
-<div style="height:450px;max-width:900px;cursor:default;">
-<div class="panel-50p" style="padding:0 15px 15px 15px;height:100%;overflow-y:hidden;">
+<div style="height:430px;max-width:900px;cursor:default;">
+<div class="panel-50p" style="padding:0 15px 15px 15px;height:calc(100% + 30px);overflow-y:hidden;max-height:unset;">
 	<div class="user-select-content-area bordered">
 		<div class="search-box">
 			<input id="search-input" type="text" placeholder="Search" onkeypress="inputSetSearch(event)"><button type="button" onclick="setSearch()"><i class="fa fa-search"></i></button>
@@ -497,12 +496,6 @@ li .content-box{
 		
 		</div>
 	</div>
-<div class="help-block no-margin-bottom ng-binding ng-scope" style="padding-left:5px;clear:both;" ng-if="FindUserController.viewModel.browseBy.Value.showShiftClickMessage">
-	Shift+Click selects a span of checkboxes.
-	<a onclick="alert('This shows a popup with more details about behavior of the above checkboxes.\nThis behavior is not included in this mockup.')" class="help-tip" aria-label="Help">
-		<i class="fa fa-info-circle"></i>
-	</a>
-</div>
 </div>
 <div class="panel-50p" id="content-main" style="position:relative;overflow:visible;height:100%;">
 	<ul class="content-box" id="level-list" style="border:0;margin-bottom:0;padding-left:0;padding-bottom:0;max-height:calc(100% - 15px);"></ul>
