@@ -30,8 +30,8 @@ html,body{
 }
 .bordered{
 	border:1px solid #DDD;
-	border-radius:4px;
 	overflow:hidden;
+	border-radius:6px;
 }
 .panel-50p{
 	width:50%;
@@ -90,34 +90,21 @@ html,body{
 div.header-bar,
 div.header-bar-selection{
     height: 35px;
-    /*background-color: #EEE;*/
+    background-color: #EEE;
+	border-bottom:1px solid #ddd;
     line-height: 30px;
     text-indent: 4px;
     position: relative;
-	display:none;
-}
-div.header-bar{
 	display:block;
 }
-.widget-box.has-selection .header-bar{
+li.has-selection .header-bar{
 	display:none!important;
 }
-.widget-box.has-selection .header-bar-selection{
+li.has-selection .header-bar-selection{
 	display:block!important;
 }
-.widget-box .header-bar:after,
-.widget-box .header-bar-selection:after{
-	content:"";
-	display:block;
-	position:absolute;
-	bottom:-1px;
-	left:15px;
-	right:15px;
-	border-top:1px solid #DDD;
-}
-.widget-box.selected .header-bar:after,
-.widget-box.selected .header-bar-selection:after{
-	border-color:#999;
+li:not(.has-selection) .header-bar-selection{
+	display:none!important;
 }
 .content-row{
 	height:100%;
@@ -257,6 +244,8 @@ a{
 .content-box{
 	background-color:#FFF;
 	border:1px solid #DDD;
+	border-bottom-right-radius:6px;
+	border-bottom-left-radius:6px;
 	box-sizing:border-box;
 	overflow-y:auto;
 	overflow-x:hidden;
@@ -273,26 +262,13 @@ a{
 #content-main ul>li:not(:last-of-type){
 	margin-bottom:15px;
 }
-.selected.widget-box{
-	border-color:#999;
+.selected .content-box{
+	border-color:#5f5b5b;
 }
 .content-box li.selected .header-bar,
 .content-box li.selected .header-bar-selection{
-	/*background-color:#dddddd;*/
-}
-.widget-box{
-	border-radius:4px;
-	border:1px solid #DDD;
-	overflow:hidden;
-}
-.widget-box .header-bar{
-	border-radius:0!important;
-	border:0;
-}
-.drop-container {
-	min-height:60px;
-	padding:5px;
-	position:relative;
+	background-color:#dddddd;
+	border-color:#5f5b5b;
 }
 .dragging .drop-container .content-item{
 	opacity:0.3;
@@ -317,7 +293,8 @@ li .content-box{
 .header-bar,
 .header-bar-selection{
 	min-height:30px;
-	/*background-color:#EEE;*/
+	border-top-right-radius:6px;
+	border-top-left-radius:6px;
 	border:1px solid #DDD;
 	border-bottom:0;
 	line-height:30px;
@@ -355,10 +332,10 @@ li .content-box{
 	position:relative;
 }
 .selected .toolbar-icon-separator{
-	background-color:#999;
+	background-color:#5d5d5d;
 }
 .toolbar-icon-separator {
-	background-color:#DDD;
+	background-color:#AAA;
 	width:2px;
 	height:25px;
 	float:right;
@@ -840,11 +817,11 @@ li .content-box{
 			let header = list[i].getElementsByClassName('header-text')[0];
 			if (list.length == 1){
 				list[i].getElementsByClassName('close-btn')[0].style.display = 'none'
-				list[i].getElementsByClassName('toolbar-icon-separator')[0].style.display = 'none'
+				//list[i].getElementsByClassName('toolbar-icon-separator')[0].style.display = 'none'
 				header.innerText = 'Reviewers';
 			} else {
 				list[i].getElementsByClassName('close-btn')[0].style.display = 'inline-block';
-				list[i].getElementsByClassName('toolbar-icon-separator')[0].style.display = 'inline-block';
+				//list[i].getElementsByClassName('toolbar-icon-separator')[0].style.display = 'inline-block';
 				header.innerText = 'Reviewers (Level ' + (i + 1) + ')';
 			}
 		}
@@ -871,7 +848,6 @@ li .content-box{
 		if (selectedItem){
 			removeItem(selectedItem);
 			unselectAll();
-			selectedItem = null;
 		} else {
 			alert('Nothing selected.');
 		}
@@ -884,7 +860,6 @@ li .content-box{
 				item[i].parentElement.removeChild(item[i]);
 				sortItems();
 				unselectAll();
-				selectedItem = null;
 				return;
 			}
 		}
@@ -902,6 +877,7 @@ li .content-box{
 	}
 	
 	function removeItem(el){
+		unselectAll();
 		var checkboxArea = document.getElementById('checkbox-area');
 		var checkboxes = checkboxArea.getElementsByTagName('input');
 		var labels = checkboxArea.getElementsByTagName('label');
@@ -912,8 +888,6 @@ li .content-box{
 			}
 		}
 		el.parentElement.removeChild(el);
-		selectedItem = null;
-		unselectAll();
 		sortItems();
 	}
 	
@@ -921,7 +895,6 @@ li .content-box{
 	function setSelectedLevel(lvl){
 		$('#level-list li').removeClass('selected');
 		if (selectedLevel != lvl){
-			selectedItem = null;
 			unselectAll();
 		}
 		selectedLevel = lvl;
@@ -931,31 +904,31 @@ li .content-box{
 	}
 	
 	function unselectAll(){
+		selectedItem = null;
 		var sel = document.querySelector('.content-item.selected');
 		if (sel)
 			sel.classList.remove('selected');
-		var selw = document.querySelector('.widget-box.has-selection');
+		var selw = document.querySelector('li.level-box.has-selection');
 		if (selw)
 			selw.classList.remove('has-selection');
 	}
 	
 	function addLevel(){
 		var li = document.createElement('li');
-		li.classList.add('widget-box');
+		li.classList.add('level-box');
 		li.innerHTML = '\
 			<div class="header-bar">\
 				<a onclick="alert(\'This shows a popup listing all users in this level, including users in selected groups/departments. Not working in mockup.\')" class="header-badge"></a>\
 				<span class="header-text"></span>\
-				<a onmousedown="event.stopPropagation();" onclick="removeLevel(this.parentElement.parentElement, event)" style="color:#5f5b5b;" class="fa fa-times toolbar-icon close-btn" title="Remove Level"></a>\
-				<i class="toolbar-icon-separator"></i>\
+				<a onmousedown="event.stopPropagation();" onclick="removeLevel(this.parentElement.parentElement, event)" style="color:#333;" class="fa fa-times toolbar-icon close-btn" title="Remove Level"></a>\
 				<a onclick="$(\'#date-popup\').show();" class="fa fa-calendar-alt toolbar-icon" title="Set Due Date"></a>\
 				<a class="fa fa-users toolbar-icon" style="position:relative;" title="Set Number of Required Users"><select onchange="setRequiredUsers(this)"><option>All</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option></select></a>\
 			</div>\
 			<div class="header-bar-selection">\
-				<a class="toolbar-icon fa fa-arrow-left" title="Back" onclick="unselectAll()" style="float:none;color:#333;"></a>\
+				<a class="toolbar-icon fa fa-chevron-left" title="Back" onclick="unselectAll()" style="float:none;color:#333;"></a>\
 				<a class="fa fa-trash-alt toolbar-icon" title="Remove Selected" onclick="deleteSelected()"></a>\
 			</div>\
-			<div class="drop-container"></div>';
+			<div class="content-box drop-container"></div>';
 		li.addEventListener('mousedown', function(){
 			let levels = levelList.getElementsByTagName('li');
 			for (var i = 0; i < levels.length; i++){
@@ -987,6 +960,7 @@ li .content-box{
 	}
 	
 	function addItem(level, name, section){
+		unselectAll();
 		let item = document.createElement('div');
 		item.innerText = name;
 		item.className = 'content-item';
@@ -1002,8 +976,8 @@ li .content-box{
 		//	removeItem(item);
 		//});
 		item.addEventListener('click', function(){
-			selectedItem = item;
 			unselectAll();
+			selectedItem = item;
 			item.parentElement.parentElement.classList.add('has-selection');
 			item.classList.add('selected');
 		});
@@ -1024,8 +998,6 @@ li .content-box{
 			}
 		});
 		sortItems();
-		selectedItem = null;
-		<!-- item.focus(); -->
 	}
 	
 	function removeLevel(el, event){
