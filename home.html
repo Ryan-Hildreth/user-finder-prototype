@@ -63,13 +63,16 @@ html,body{
 	height:0;
 	position: relative;
 }
+.selected .header-text{
+	font-weight:600;
+}
 .header-text{
-	font-weight:700;
-	margin-bottom:5px;
+	/*font-weight:600;*/
 	height:18px;
     text-indent:2px;
     font-size: 14px;
-	margin-top:15px;
+	margin-top:4px;
+	display:inline-block;
 }
 .header-badge{
 	border-radius:10px;
@@ -82,9 +85,10 @@ html,body{
 	color:#edecec;
 	text-align:center;
 	display:inline-block;
-	padding:0 3px 0 3px;
+	margin:12px 3px 0 3px;
 	text-indent:0;
 	cursor:pointer;
+	vertical-align:top;
 }
 .header-bar>td,
 div.header-bar{
@@ -339,7 +343,7 @@ li .content-box{
 	background-color:#EEE;
 }
 .content-item.selected{
-	background-color:#BBB;
+	background-color:#DDD;
 	outline:0;
 }
 .toolbar-icon {
