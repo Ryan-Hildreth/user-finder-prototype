@@ -30,8 +30,8 @@ html,body{
 }
 .bordered{
 	border:1px solid #DDD;
+	border-radius:4px;
 	overflow:hidden;
-	border-radius:6px;
 }
 .panel-50p{
 	width:50%;
@@ -87,24 +87,36 @@ html,body{
 	cursor:pointer;
 }
 .header-bar>td,
-div.header-bar,
-div.header-bar-selection{
+div.header-bar{
     height: 35px;
-    background-color: #EEE;
-	border-bottom:1px solid #ddd;
-    line-height: 30px;
-    text-indent: 4px;
     position: relative;
 	display:block;
 }
-li.has-selection .header-bar{
+div.header-bar-selection{
+    display: none;
+    height: 35px;
+    line-height: 30px;
+    text-indent: 4px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #FFF;
+}
+.widget-box.has-selection .header-bar{
 	display:none!important;
 }
-li.has-selection .header-bar-selection{
+.widget-box.has-selection .header-bar-selection{
 	display:block!important;
 }
-li:not(.has-selection) .header-bar-selection{
-	display:none!important;
+.widget-box .header-bar:after{
+	content:"";
+	display:block;
+	position:absolute;
+	bottom:-1px;
+	left:15px;
+	right:15px;
+	border-top:1px solid #5f5b5b;
 }
 .content-row{
 	height:100%;
@@ -244,8 +256,6 @@ a{
 .content-box{
 	background-color:#FFF;
 	border:1px solid #DDD;
-	border-bottom-right-radius:6px;
-	border-bottom-left-radius:6px;
 	box-sizing:border-box;
 	overflow-y:auto;
 	overflow-x:hidden;
@@ -262,13 +272,24 @@ a{
 #content-main ul>li:not(:last-of-type){
 	margin-bottom:15px;
 }
-.selected .content-box{
+.selected.widget-box{
 	border-color:#5f5b5b;
 }
-.content-box li.selected .header-bar,
-.content-box li.selected .header-bar-selection{
-	background-color:#dddddd;
-	border-color:#5f5b5b;
+.widget-box{
+	border-radius:4px;
+	border:1px solid #EEE;
+	background-color:#FFF;
+	overflow:hidden;
+	position:relative;
+}
+.widget-box .header-bar{
+	border-radius:0!important;
+	border:0;
+}
+.drop-container {
+	min-height:60px;
+	padding:10px;
+	position:relative;
 }
 .dragging .drop-container .content-item{
 	opacity:0.3;
@@ -292,13 +313,13 @@ li .content-box{
 }
 .header-bar,
 .header-bar-selection{
-	min-height:30px;
-	border-top-right-radius:6px;
-	border-top-left-radius:6px;
-	border:1px solid #DDD;
+	height:30px;
 	border-bottom:0;
 	line-height:30px;
 	padding:0 8px;
+}
+.popup .header-bar{
+	background-color:#EEE;
 }
 .drag-container{
 	white-space:nowrap;
@@ -311,7 +332,7 @@ li .content-box{
 }
 .content-item{
 	font-size:14px;
-	height:18px;
+	padding:3px;
 	cursor:move;
 }
 .content-item:hover{
@@ -332,10 +353,10 @@ li .content-box{
 	position:relative;
 }
 .selected .toolbar-icon-separator{
-	background-color:#5d5d5d;
+	background-color:#999;
 }
 .toolbar-icon-separator {
-	background-color:#AAA;
+	background-color:#DDD;
 	width:2px;
 	height:25px;
 	float:right;
@@ -357,6 +378,7 @@ li .content-box{
 	transform:translateX(-50%) translateY(-50%);
 	border:1px solid #555;
     border-radius:6px;
+	overflow:hidden;
 }
 .popup>.content-box{
      margin-bottom: 0;
@@ -469,6 +491,12 @@ li .content-box{
     background-color: #5f5b5b;
     border: 0;
 }
+#checkbox-area div{
+	padding:1px;
+}
+#checkbox-area div:hover{
+	background-color:#EEE;
+}
 </style>
 </head>
 <body>
@@ -495,9 +523,9 @@ li .content-box{
 		</div>
 	</div>
 </div>
-<div class="panel-50p" id="content-main" style="position:relative;overflow:visible;height:100%;">
-	<ul class="content-box" id="level-list" style="border:0;margin-bottom:0;padding-left:0;padding-bottom:0;max-height:100%;overflow:visible;"></ul>
-	<table width="100%" style="margin-top:8px;white-space:nowrap;"><tr>
+<div class="panel-50p" id="content-main" style="position:relative;overflow:visible;height:100%;background-color:#EEE;">
+	<ul class="content-box" id="level-list" style="border:0;margin-bottom:0;max-height:100%;overflow:auto;background-color:#EEE;padding:15px 15px 0 15px;;"></ul>
+	<table width="100%" style="margin-top:8px;margin-left:15px;white-space:nowrap;"><tr>
 		<td><a onclick="addLevel();updateLevelLabels();sortItems();"><i class="fa fa-plus"></i>&nbsp;Add Level</a></td>
 	</tr></table>
 	
@@ -848,6 +876,7 @@ li .content-box{
 		if (selectedItem){
 			removeItem(selectedItem);
 			unselectAll();
+			selectedItem = null;
 		} else {
 			alert('Nothing selected.');
 		}
@@ -860,6 +889,7 @@ li .content-box{
 				item[i].parentElement.removeChild(item[i]);
 				sortItems();
 				unselectAll();
+				selectedItem = null;
 				return;
 			}
 		}
@@ -877,7 +907,6 @@ li .content-box{
 	}
 	
 	function removeItem(el){
-		unselectAll();
 		var checkboxArea = document.getElementById('checkbox-area');
 		var checkboxes = checkboxArea.getElementsByTagName('input');
 		var labels = checkboxArea.getElementsByTagName('label');
@@ -888,6 +917,8 @@ li .content-box{
 			}
 		}
 		el.parentElement.removeChild(el);
+		selectedItem = null;
+		unselectAll();
 		sortItems();
 	}
 	
@@ -895,6 +926,7 @@ li .content-box{
 	function setSelectedLevel(lvl){
 		$('#level-list li').removeClass('selected');
 		if (selectedLevel != lvl){
+			selectedItem = null;
 			unselectAll();
 		}
 		selectedLevel = lvl;
@@ -903,32 +935,36 @@ li .content-box{
 		}
 	}
 	
-	function unselectAll(){
-		selectedItem = null;
+	function unselectAll(v){
 		var sel = document.querySelector('.content-item.selected');
 		if (sel)
 			sel.classList.remove('selected');
-		var selw = document.querySelector('li.level-box.has-selection');
+		var selw = document.querySelector('.widget-box.has-selection');
 		if (selw)
 			selw.classList.remove('has-selection');
+		selectedItem = null;
+		if (!v)
+			$('.header-bar-selection').slideUp();
 	}
 	
 	function addLevel(){
 		var li = document.createElement('li');
-		li.classList.add('level-box');
+		li.classList.add('widget-box');
 		li.innerHTML = '\
 			<div class="header-bar">\
 				<a onclick="alert(\'This shows a popup listing all users in this level, including users in selected groups/departments. Not working in mockup.\')" class="header-badge"></a>\
 				<span class="header-text"></span>\
-				<a onmousedown="event.stopPropagation();" onclick="removeLevel(this.parentElement.parentElement, event)" style="color:#333;" class="fa fa-times toolbar-icon close-btn" title="Remove Level"></a>\
+				<a onmousedown="event.stopPropagation();" onclick="removeLevel(this.parentElement.parentElement, event)" style="color:#5f5b5b;" class="fa fa-times toolbar-icon close-btn" title="Remove Level"></a>\
 				<a onclick="$(\'#date-popup\').show();" class="fa fa-calendar-alt toolbar-icon" title="Set Due Date"></a>\
 				<a class="fa fa-users toolbar-icon" style="position:relative;" title="Set Number of Required Users"><select onchange="setRequiredUsers(this)"><option>All</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option></select></a>\
 			</div>\
-			<div class="header-bar-selection">\
-				<a class="toolbar-icon fa fa-chevron-left" title="Back" onclick="unselectAll()" style="float:none;color:#333;"></a>\
-				<a class="fa fa-trash-alt toolbar-icon" title="Remove Selected" onclick="deleteSelected()"></a>\
+			<div class="header-bar-selection" style="border-bottom:1px solid #DDD;height:37px;">\
+				<div style="position:absolute;bottom:0;left:0;right:5px;">\
+					<a class="toolbar-icon fa fa-chevron-up" title="Back" onclick="unselectAll()" style="float:none;color:#333;"></a>\
+					<a class="fa fa-trash-alt toolbar-icon" title="Remove Selected" onclick="deleteSelected()"></a>\
+				</div>\
 			</div>\
-			<div class="content-box drop-container"></div>';
+			<div class="drop-container"></div>';
 		li.addEventListener('mousedown', function(){
 			let levels = levelList.getElementsByTagName('li');
 			for (var i = 0; i < levels.length; i++){
@@ -960,7 +996,6 @@ li .content-box{
 	}
 	
 	function addItem(level, name, section){
-		unselectAll();
 		let item = document.createElement('div');
 		item.innerText = name;
 		item.className = 'content-item';
@@ -976,9 +1011,9 @@ li .content-box{
 		//	removeItem(item);
 		//});
 		item.addEventListener('click', function(){
-			unselectAll();
+			unselectAll(selectedItem && item.parentElement == selectedItem.parentElement);
 			selectedItem = item;
-			item.parentElement.parentElement.classList.add('has-selection');
+			$(item.parentElement.parentElement.querySelector('.header-bar-selection')).slideDown();
 			item.classList.add('selected');
 		});
 		$(item).draggable({
@@ -998,6 +1033,8 @@ li .content-box{
 			}
 		});
 		sortItems();
+		unselectAll();
+		selectedItem = null;
 	}
 	
 	function removeLevel(el, event){
